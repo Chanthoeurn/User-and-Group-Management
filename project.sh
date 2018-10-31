@@ -1,6 +1,7 @@
 #! /bin/bash
 
 #script to add a user to Linux system
+
 function add_user(){
 if [ $(id -u) -eq 0 ]; then
 
@@ -43,11 +44,8 @@ awk -F":" '
 { printf "%-15s %-15s %-15s %-15s %-20s\n", $1,$3,$4,$6,$7 } ' /etc/passwd | nl     
 }
 
-#script to display all user account
+#script to display group account
 function display_group(){
-    # awk -F: '{ print $1}' /etc/group | cut -d: -f1 | nl
-    #! /bin/bash
-
     echo "___________________________________________________________________________________________"
     echo "********************************Display All Group Account**********************************"
     awk -F":" '
@@ -57,9 +55,7 @@ function display_group(){
     print "__________________________________________________________________________________________"
     }
     '
-
-    awk -F":" '
-    { printf "%-20s %-15s\n", $1,$3 } ' /etc/group | nl
+    awk -F":" '{ printf "%-20s %-15s\n", $1,$3 } ' /etc/group | nl
 }
 
 
@@ -67,7 +63,6 @@ function display_group(){
 function change_password(){
         ROOT_UID=0
         E_WRONG_USER=65
-
         E_NO_SUCH_USER=70
         SUCCESS=0
         echo "________________________________________________________________"
@@ -75,7 +70,6 @@ function change_password(){
         echo "****************Change Password User Account********************"
         echo "________________________________________________________________"
         echo "                                                                "
-        
 
         if [ "$UID" -ne "$ROOT_UID" ]
         then
@@ -85,10 +79,8 @@ function change_password(){
         else
          echo "Continue with password change"
         fi
-
         read -p "Enter Username you to change password :" username
         read -p "Enter New Password :" newpassword
-
         grep -q "$username" /etc/passwd
         if [ $? -ne $SUCCESS ]
         then
@@ -103,38 +95,33 @@ function change_password(){
 
 function delete_user(){
     ROOT_UID=0
-E_WRONG_USER=65
+    E_NO_SUCH_USER=70
+    SUCCESS=0
 
-E_NO_SUCH_USER=70
-SUCCESS=0
+    echo "________________________________________________________________"
+    echo "                                                                "
+    echo "****************Delete User Account********************"
+    echo "________________________________________________________________"
+    echo "                                                                "
 
-        echo "________________________________________________________________"
-        echo "                                                                "
-        echo "****************Delete User Account********************"
-        echo "________________________________________________________________"
-        echo "                                                                "
+    if [ "$UID" -ne "$ROOT_UID" ]
+    then
+    echo "You need to be logged in as root to perform this operation"
+    break
+    else
+    echo "Continue with Delete user"
+    fi
 
-
-if [ "$UID" -ne "$ROOT_UID" ]
-then
- echo "You need to be logged in as root to perform this operation"
- break
-else
- echo "Continue with Delete user"
-fi
-
-read -p "Enter Username you to Delete :" username
-
-
-grep -q "$username" /etc/passwd
-if [ $? -ne $SUCCESS ]
-then
-  echo "No such user exist"
-  break
-fi
-userdel $username
-echo "User Deleted"
-break
+    read -p "Enter Username you to Delete :" username
+    grep -q "$username" /etc/passwd
+    if [ $? -ne $SUCCESS ]
+    then
+    echo "No such user exist"
+    break
+    fi
+    userdel $username
+    echo "User Deleted"
+    break
 }
 
 
@@ -164,53 +151,44 @@ function create_group(){
 
 #function Delete group
 function delete_group(){
-    #! /bin/bash
+    ROOT_UID=0
+    E_WRONG_USER=65
+    E_NO_SUCH_USER=70
+    SUCCESS=0
 
-ROOT_UID=0
-E_WRONG_USER=65
-
-E_NO_SUCH_USER=70
-SUCCESS=0
-
-        echo "________________________________________________________________"
-        echo "                                                                "
-        echo "****************Delete Group Account****************************"
-        echo "________________________________________________________________"
-        echo "                                                                "
+    echo "________________________________________________________________"
+    echo "                                                                "
+    echo "****************Delete Group Account****************************"
+    echo "________________________________________________________________"
+    echo "                                                                "
 
 
-if [ "$UID" -ne "$ROOT_UID" ]
-then
- echo "You need to be logged in as root to perform this operation"
- break
-else
- echo "Continue with Delete group"
-fi
-
-read -p "Enter groupname you to Delete :" username
-
-
-grep -q "$username" /etc/group
-if [ $? -ne $SUCCESS ]
-then
-  echo "No such group exist"
-  break
-fi
-groupdel $username
-echo "Group Deleted"
-break
+    if [ "$UID" -ne "$ROOT_UID" ]
+    then
+        echo "You need to be logged in as root to perform this operation"
+        break
+    else
+        echo "Continue with Delete group"
+    fi
+        read -p "Enter groupname you to Delete :" username
+        grep -q "$username" /etc/group
+    if [ $? -ne $SUCCESS ]
+    then
+        echo "No such group exist"
+        break
+    fi
+        groupdel $username
+        echo "Group Deleted"
+        break
 }
 
 function addnewuser_group(){
-
     SUCCESS=0
     echo "________________________________________________________________"
     echo "                                                                "
     echo "****************Add new User to Group Account*******************"
     echo "________________________________________________________________"
     echo "                                                                "
-
-
     echo -n "Enter new group name: "
     read group
     echo -n "Enter Username:"
@@ -236,8 +214,7 @@ function addnewuser_group(){
     fi
 }
 function addexistuser_group(){
-     SUCCESS=0
-    
+     SUCCESS=0  
     echo "________________________________________________________________"
     echo "                                                                "
     echo "*************Add Existing User to Group Account*****************"
@@ -267,41 +244,72 @@ function addexistuser_group(){
 
     fi
 }
+
+
 function displayuser_ingroup(){
     echo -n "Enter Group name you want to diplay:"
     read group
     grep "^$group" /etc/group
 }
 
+function header(){
+        echo "_______________________________________________________"
+        echo "|                                                     |"
+        echo "|                                                     |"
+        echo "|        <--- Account and Group Management --->       |"
+        echo "|                                                     |"
+        echo "| SLS Year4                                   Group3  |"
+        echo "|_____________________________________________________|"
+        echo "                                                      "
+}
+function footer(){
+
+        echo "                                                      "
+        echo ",_____________________________________________________,"
+        echo "|                                                     |"
+        echo "|    ====> Enter any number for select option         |"
+        echo "|_____________________________________________________|"
+}
+
 
 while true
 do 
     clear
-        echo "======================================================"
-        echo "============Account and Group Management ============="
-        echo "______________________________________________________"
+        echo "_______________________________________________________"
+        echo "|                                                     |"
+        echo "|                                                     |"
+        echo "|        <--- Account and Group Management --->       |"
+        echo "|                                                     |"
+        echo "| SLS Year4                                   Group3  |"
+        echo "|_____________________________________________________|"
         echo "                                                      "
-        echo "1. User Account"
-        echo "2. Group Account"
-        echo "3. Modify User/Group Account"
-        echo "4. Display All User/Group Account"
-        echo "______________________________________________________"
+        echo "        1. User Account"
+        echo "        2. Group Account"
+        echo "        3. Modify User/Group Account"
+        echo "        4. Display All User/Group Account"
         echo "                                                      "
-        echo "Enter Q to Quit Program"
-        echo "                                                      "
-        echo "======================================================"
-                read -p "Please Enter Your Choice :" answer
+        echo ",_____________________________________________________,"
+        echo "|    ====> Enter any number for select option         |"
+        echo "|    ====> Enter Q to Quit Program                    |"
+        echo "|                                                     |"
+        echo "|_____________________________________________________|"
+                read -p "     ====> Please Enter Your Choice :" answer
         case "$answer" in
                 1)      while true
                         do
                                 clear
-                                echo "1. Display all User Account"
-                                echo "2. Create New User Account"
-                                echo "3. Change password"
-                                echo "4. Delete User Account"
-                                echo "5. Back"
+                                #invoke header
+                                header
+
+                                echo "      1. Display all User Account"
+                                echo "      2. Create New User Account"
+                                echo "      3. Change password"
+                                echo "      4. Delete User Account"
+                                echo "      5. Back"
+                                #invoke footer
+                                footer
                                 echo -e "\n"
-                                read -p "Please Enter Your Choice :" answer1
+                                read -p "   ====> Please Enter Your Choice :" answer1
                                 case "$answer1" in
                                         1) clear
                                            #invoke display_user
@@ -330,14 +338,16 @@ do
                 2)      while true
                         do
                                 clear
-                                echo "1. Create new Group Account"
-                                echo "2. Display Group Account"
-                                echo "3. Delete Group Account"
-                                echo "4. Add new User to Group Account"
-                                echo "5. Add exist User to Group Account"
-                                echo "6. Back"
+                                header
+                                echo "     1. Create new Group Account"
+                                echo "     2. Display Group Account"
+                                echo "     3. Delete Group Account"
+                                echo "     4. Add new User to Group Account"
+                                echo "     5. Add exist User to Group Account"
+                                echo "     6. Back"
+                                footer
                                 echo -e "\n"
-                                read -p "Please Enter Your Choice :" answer1
+                                read -p "    ====> Please Enter Your Choice :" answer1
                                 case "$answer1" in
                                         1) clear
                                            create_group
@@ -367,19 +377,17 @@ do
                 3)      while true
                         do
                                 clear
-                                echo "1. Modify User Password"
-                                echo "2. Modify Group Password"
-                                echo "3. Back"
+                                header
+                                echo "    1. Modify User Password"
+                                echo "    2. Back"
+                                footer
                                 echo -e "\n"
-                                read -p "Please Enter Your Choice :" answer1
+                                read -p "    ====> Please Enter Your Choice :" answer1
                                 case "$answer1" in
                                         1) clear
                                            change_password
                                            ;;
                                         2) clear
-                                           echo "Modify Group password"
-                                           ;;
-                                        3) clear
                                            echo "Backing..."
                                            break       
                                 esac
@@ -392,11 +400,13 @@ do
                         while true
                         do
                                 clear
-                                echo "1. Display User Account"
-                                echo "2. Display Group Account"
-                                echo "3. Back"
+                                header
+                                echo "     1. Display User Account"
+                                echo "     2. Display Group Account"
+                                echo "     3. Back"
+                                footer
                                 echo -e "\n"
-                                read -p "Please Enter Your Choice :" answer1
+                                read -p "    ====> Please Enter Your Choice :" answer1
                                 case "$answer1" in
                                         1) clear
                                            #invoke display user
